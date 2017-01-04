@@ -32,4 +32,4 @@ const styles = {
   }
 }
 
-export default Button;
+exports.Button = Button;
