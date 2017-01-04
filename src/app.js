@@ -3,19 +3,14 @@ import { View, Text } from 'react-native'
 import { Header, Button, Spinner, Card, CardSection } from './components/common'
 import firebase from 'firebase';
 import LoginForm from './components/LoginForm'
+import config from './config'
 
 
 class App extends Component {
   state =  { loggedIn: null}
 
   componentWillMount () {
-    const config = {
-      apiKey: 'AIzaSyDPKnkgEt61iKU0s9weAOpKDagAQEtADQ4',
-      authDomain: 'auth-4ff35.firebaseapp.com',
-      databaseURL: 'https://auth-4ff35.firebaseio.com',
-      storageBucket: 'auth-4ff35.appspot.com',
-      messagingSenderId: '180304878263'
-    };
+
   firebase.initializeApp(config);
 
     firebase.auth().onAuthStateChanged((user) => {
