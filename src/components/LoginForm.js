@@ -1,11 +1,51 @@
 import React, {Component} from 'react'
 import { View, Text } from 'react-native'
-import { Button, Card, CardSection, Input } from './common';
+import firebase from 'firebase'
+import { Button, Card, CardSection, Input, Spinner } from './common';
 
 class LoginForm extends Component {
-  state = { email: '', password: '' }
+  state = { email: '', password: '', error: '', loading: false }
+
+  onButtonPress() {
+    const { email, password } = this.state
+
+    this.setState({error: '', loading: true})
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(()=> this.onLoginSuccess.bind(this))
+      .catch(()=> {
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then(()=> this.onLoginSuccess.bind(this))
+          .catch((err)=> {
+            this.onLoginFail.bind(this)
+          })
+      })
+
+  }
+
+ onLoginFail() {
+    this.setState({ error: 'Authentication Failed', loading: false });
+  }
+
+  onLoginSuccess () {
+    this.setState({
+      email: '', 
+      password: '', 
+      error: '', 
+      loading: false
+    })
+  }
+  renderButton () {
+    if (this.state.loading) {
+      return <Spinner />
+    }
+    return (
+      <Button onPress={this.onButtonPress.bind(this)}>
+        Log in
+      </Button>
+    )
+  }
   render() {
-    const { containerStyle, emailStyle } = styles
+    const { containerStyle, emailStyle, errorStyle } = styles
     return (
       <Card>
         <CardSection>
@@ -26,12 +66,10 @@ class LoginForm extends Component {
             />
         </CardSection>
         <CardSection>
-          <Text>{`${this.state.email}/${this.state.password}`}</Text>
+          <Text style={errorStyle}>{this.state.error}</Text>
         </CardSection>
         <CardSection>
-          <Button>
-            Log in
-          </Button>
+          {this.renderButton()}
         </CardSection>
       </Card>
     )
@@ -47,6 +85,11 @@ const styles = {
     height: 40,
     width: 220,
     marginLeft: 10
+  },
+  errorStyle: {
+    color: 'red',
+    fontSize: 20,
+    alignSelf: 'center'
   }
 }
 
